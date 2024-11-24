@@ -10,15 +10,14 @@ const ChatBot = () => {
     },
   ]);
   const [input, setInput] = useState("");
-  const messagesEndRef = useRef<HTMLDivElement>(null); // Referência para o final da lista de mensagens
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Função para rolar automaticamente para o final
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
-    scrollToBottom(); // Rola sempre que mensagens mudam
+    scrollToBottom();
   }, [messages]);
 
   const getDisfluency = () => {
@@ -29,27 +28,23 @@ const ChatBot = () => {
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    // Adiciona a mensagem do usuário
-    setMessages((prev) => [...prev, { sender: "user", text: input }]);
-
     const userMessage = input.trim();
+    const toBody = [...messages, { sender: "user", text: userMessage }];
+    setMessages((prev) => [...prev, { sender: "user", text: userMessage }]);
     setInput("");
-
-    // Adiciona uma disfluência de preenchimento
     setMessages((prev) => [...prev, { sender: "bot", text: getDisfluency() }]);
 
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: userMessage }),
+        body: JSON.stringify({ prompt: toBody }),
       });
 
       const data = await response.json();
 
-      // Atualiza a mensagem do bot com a resposta da API
       setMessages((prev) => [
-        ...prev.slice(0, -1), // Remove a disfluência
+        ...prev.slice(0, -1),
         {
           sender: "bot",
           text: data.reply || "Não consegui processar sua solicitação.",
@@ -77,12 +72,10 @@ const ChatBot = () => {
 
   return (
     <div style={styles.container}>
-      {/* Header do Chat */}
       <div style={styles.header}>
         <h2 style={styles.headerTitle}>ChatODS</h2>
       </div>
 
-      {/* Janela de Mensagens */}
       <div style={styles.chatWindow}>
         {messages.map((msg, index) => (
           <div
@@ -92,7 +85,6 @@ const ChatBot = () => {
               justifyContent: msg.sender === "user" ? "flex-end" : "flex-start",
             }}
           >
-            {/* Avatar */}
             {msg.sender === "bot" && (
               <img src={botAvatar} alt="bot" style={styles.avatar} />
             )}
@@ -110,11 +102,9 @@ const ChatBot = () => {
             )}
           </div>
         ))}
-        {/* Sentinela para rolar automaticamente */}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input e Botão */}
       <div style={styles.inputContainer}>
         <input
           style={styles.input}
