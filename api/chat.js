@@ -48,6 +48,7 @@ export default async function handler(req, res) {
     const response = await axios.post(GEMINI_URL, requestData, {
       headers: {
         "Content-Type": "application/json",
+        Referer: "https://chatbot-ods.vercel.app/",
       },
     });
     console.log("API: ", fullPrompt);
